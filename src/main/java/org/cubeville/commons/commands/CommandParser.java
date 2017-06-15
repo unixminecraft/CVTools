@@ -29,25 +29,35 @@ public class CommandParser
             String[] args = smartSplit(full).toArray(new String[0]);
 
             String parameterError = null;
+            BaseCommand cmd = null;
+            int cmdMatch = -1;
             for(BaseCommand command: commands) {
-                if(command.checkCommand(args)) {
-                    parameterError = command.checkParameters(args);
-                    if(parameterError == null) {
-                        CommandResponse response = command.execute(commandSender, args);
-                        if(response == null) {
-                            commandSender.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
+                if(command.commandMatches(args)) {
+                    int match = command.checkCommand(args);
+                    if(match > cmdMatch) {
+                        parameterError = command.checkParameters(args);
+                        if(parameterError == null) {
+                            cmd = command;
+                            cmdMatch = match;
                         }
-                        else {
-                            for (String message: response.getMessages())
-                                commandSender.sendMessage(ColorUtils.addColor(message));
-                        }
-                        return true;
                     }
                 }
             }
 
+            if(cmdMatch >= 0) { 
+                CommandResponse response = cmd.execute(commandSender, args);
+                if(response == null) {
+                    commandSender.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
+                }
+                else {
+                    for (String message: response.getMessages())
+                        commandSender.sendMessage(ColorUtils.addColor(message));
+                }
+                return true;
+            }
+            
             if(parameterError != null) {
-                commandSender.sendMessage(parameterError);
+                commandSender.sendMessage(ColorUtils.addColor("&c" + parameterError));
             }
 
             else {
@@ -74,6 +84,7 @@ public class CommandParser
 
     private List<String> smartSplit(String full) {
         // I don't like this piece of code....
+        if(full.length() == 0) return new ArrayList<>();
         boolean inQuotes = false;
         List<String> ret = new ArrayList<>();
         ret.add(new String());
@@ -96,7 +107,6 @@ public class CommandParser
             else {
                 ret.set(lsize - 1, ret.get(lsize - 1) + full.charAt(i));
             }
-
         }
 
         if(inQuotes) throw new IllegalArgumentException("Unbalanced quotes!");

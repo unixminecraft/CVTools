@@ -8,13 +8,17 @@ public class CommandParameterListInteger implements CommandParameterType
 {
     int length;
 
+    public CommandParameterListInteger() {
+        this.length = 0;
+    }
+    
     public CommandParameterListInteger(int length) {
         this.length = length;
     }
-    
+
     public boolean isValid(String value) {
         String[] parts = value.split(";");
-        if(parts.length != length) return false;
+        if(length != 0 && parts.length != length) return false;
         try {
             for(int i = 0; i < parts.length; i++) {
                 Integer.valueOf(parts[i]);
@@ -28,7 +32,7 @@ public class CommandParameterListInteger implements CommandParameterType
 
     public String getInvalidMessage(String value) {
         String[] parts = value.split(";");
-        if(parts.length != length) return value + " has not the correct length of " + length;
+        if(length != 0 && parts.length != length) return value + " has not the correct length of " + length;
         return "No valid number.";
     }
 

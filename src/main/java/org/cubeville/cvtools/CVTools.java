@@ -30,6 +30,7 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new CheckRegionPlayers());
         commandParser.addCommand(new CheckSign());
         commandParser.addCommand(new DelayedTask(this));
+        commandParser.addCommand(new Head());
         commandParser.addCommand(new Info());
 
         noGrowthWorlds = new HashSet<>();

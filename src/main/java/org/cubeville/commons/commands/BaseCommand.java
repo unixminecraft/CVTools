@@ -19,9 +19,14 @@ public abstract class BaseCommand
     private Map<String, CommandParameterType> mandatory;
     private List<CommandParameterType> base;
     int mandatoryBase;
-
+    
     public BaseCommand(String fullCommand) {
-        commands = Arrays.asList(fullCommand.split(" "));
+        if(fullCommand.length() == 0) {
+            commands = new ArrayList<>();
+        }
+        else {
+            commands = Arrays.asList(fullCommand.split(" "));
+        }
         flags = new HashSet<>();
         optional = new HashMap<>();
         mandatory = new HashMap<>();
@@ -29,6 +34,7 @@ public abstract class BaseCommand
     }
 
     public String getFullCommand() {
+        if(commands.size() == 0) return "";
         String ret = commands.get(0);
         for(int i = 1; i < commands.size(); i++) ret += " " + commands.get(i);
         return ret;
@@ -65,7 +71,21 @@ public abstract class BaseCommand
         }
     }
 
-    public boolean checkCommand(String[] args) {
+    public int checkCommand(String[] args) {
+        System.out.println("Check args: " + args + " with command " + getFullCommand());
+        if(args.length < commands.size()) return 0;
+        for(int i = 0; i < commands.size(); i++) {
+            if(!args[i].equals(commands.get(i))) {
+                System.out.println("Matched: " + i);
+                return i;
+            }
+        }
+        System.out.println("Match: complete (" + commands.size() + ")");
+        return commands.size();
+    }
+
+    public boolean commandMatches(String[] args) {
+        if(commands.size() == 0) return true;
         if(args.length < commands.size()) return false;
         for(int i = 0; i < commands.size(); i++) {
             if(!args[i].equals(commands.get(i))) {
@@ -74,7 +94,7 @@ public abstract class BaseCommand
         }
         return true;
     }
-
+    
     public String checkParameters(String[] args) {
         Set<String> flagsChecked = new HashSet<>();
         Set<String> mandatoryParametersChecked = new HashSet<>();
@@ -112,10 +132,10 @@ public abstract class BaseCommand
             }
         }
         if(baseParametersSet > base.size() || baseParametersSet < mandatoryBase) {
-            return "Wrong number of parameters!";
+            return "&cWrong number of parameters!";
         }
         if(mandatoryParametersChecked.size() != mandatory.size()) {
-            return "Mandatory parameter(s) missing!";
+            return "&cMandatory parameter(s) missing!";
         }
         return null;
     }

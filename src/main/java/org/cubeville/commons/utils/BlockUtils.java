@@ -20,14 +20,14 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class BlockUtils {
-	
+
     public static List<Block> getBlocksInRadius(Location loc, int radius) {
         Location loc1 = new Location(loc.getWorld(), loc.getBlockX() - radius, loc.getBlockY() - radius, loc.getBlockZ() - radius);
         Location loc2 = new Location(loc.getWorld(), loc.getBlockX() + radius, loc.getBlockY() + radius, loc.getBlockZ() + radius);
-		
+
         List<Block> blocks = getBlocksInCube(loc1, loc2);
         List<Block> newBlocks = new ArrayList<>();
-		
+
         for(Block block: blocks) {
             if (block.getLocation().distance(loc) < radius)
                 newBlocks.add(block);
@@ -35,10 +35,10 @@ public class BlockUtils {
 
         return blocks;
     }
-	
+
     public static List<Block> getBlocksInCube(Location loc1, Location loc2) {
         List<Block> blocks = new ArrayList<>();
-		
+
         for (int x = loc1.getBlockX(); x <= loc2.getBlockX(); x++) {
             for (int y = loc1.getBlockY(); y <= loc2.getBlockY(); y++) {
                 for (int z = loc1.getBlockZ(); z <= loc2.getBlockZ(); z++) {
@@ -46,7 +46,7 @@ public class BlockUtils {
                 }
             }
         }
-		
+
         return blocks;
     }
 
@@ -54,7 +54,7 @@ public class BlockUtils {
         WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         Selection selection = worldEdit.getSelection(player);
         if(selection == null) throw new IllegalArgumentException("No region selected.");
-        
+
         World world = selection.getWorld();
         Location min = selection.getMinimumPoint();
         Location max = selection.getMaximumPoint();
@@ -72,16 +72,14 @@ public class BlockUtils {
                         blocks.add(world.getBlockAt(x, y, z));
                     }
                 }
-            }                
+            }
         }
         return blocks;
     }
 
     public static List<Block> getBlocksInWGRegion(World world, String name, int limit) {
-        WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        RegionManager regionManager = worldGuard.getRegionManager(world);
-        ProtectedRegion region = regionManager.getRegion(name);
-        if(region == null) throw new IllegalArgumentException("No region found by that name!");
+        ProtectedRegion region = getWGRegion(world, name);
+
         BlockVector min = region.getMinimumPoint();
         BlockVector max = region.getMaximumPoint();
         List<Block> blocks = new ArrayList<>();
@@ -103,6 +101,24 @@ public class BlockUtils {
         return blocks;
     }
 
+    public static int getWESelectionArea(Player player) {
+        Selection sel = getWESelection(player);
+        Location min = sel.getMinimumPoint();
+        Location max = sel.getMaximumPoint();
+        int y = min.getBlockY();
+        int xmin = min.getBlockX();
+        int xmax = max.getBlockX();
+        int zmin = min.getBlockZ();
+        int zmax = max.getBlockZ();
+        int cnt = 0;
+        for(int x = xmin; x <= xmax; x++) {
+            for(int z = zmin; z <= zmax; z++) {
+                if(sel.contains(new Vector(x, y, z).toLocation(player.getLocation().getWorld()))) cnt++;
+            }
+        }
+        return cnt;
+    }
+    
     public static void setWESelection(Player player, World world, Vector pos1, Vector pos2) {
         WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         com.sk89q.worldedit.Vector wep1 = new com.sk89q.worldedit.Vector(pos1.getX(), pos1.getY(), pos1.getZ());
@@ -133,7 +149,7 @@ public class BlockUtils {
         if(region == null) throw new IllegalArgumentException("No region found by that name!");
         return region;
     }
-    
+
     public static Vector getWGRegionMin(World world, String name) {
         BlockVector min = getWGRegion(world, name).getMinimumPoint();
         return new Vector(min.getX(), min.getY(), min.getZ());
@@ -143,7 +159,7 @@ public class BlockUtils {
         BlockVector max = getWGRegion(world, name).getMaximumPoint();
         return new Vector(max.getX(), max.getY(), max.getZ());
     }
-    
+
     public static List<Block> getBlocksInRadiusByType(Location loc, int radius, Material... mats) {
         List<Block> blocks = getBlocksInRadius(loc, radius);
         return getBlocksByType(blocks, mats);

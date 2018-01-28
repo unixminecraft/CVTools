@@ -9,6 +9,9 @@ commands:
   cvtools:
     description: CVTools Base Command
     permission: cvtools.commands
+  cvtoolstest:
+    description: CVTools Test Command
+    permission: cvtools.testcommand
 
 permissions:
   

@@ -72,7 +72,6 @@ public abstract class BaseCommand
     }
 
     public int checkCommand(String[] args) {
-        System.out.println("Check args: " + args + " with command " + getFullCommand());
         if(args.length < commands.size()) return 0;
         for(int i = 0; i < commands.size(); i++) {
             if(!args[i].equals(commands.get(i))) {
@@ -80,7 +79,6 @@ public abstract class BaseCommand
                 return i;
             }
         }
-        System.out.println("Match: complete (" + commands.size() + ")");
         return commands.size();
     }
 
@@ -102,7 +100,8 @@ public abstract class BaseCommand
         int baseParametersSet = 0;
 
         for(int i = commands.size(); i < args.length; i++) {
-            String[] parts = args[i].split(":", 2);
+            String[] parts = splitArgument(args[i]);
+            //String[] parts = args[i].split(":", 2);
             String name = parts[0];
             if(parts.length == 1) {
                 if(flags.contains(name)) {
@@ -146,7 +145,7 @@ public abstract class BaseCommand
         Map<String, Object> parameters = new HashMap<>();
         List<Object> baseParameters = new ArrayList<>();
         for(int i = commands.size(); i < args.length; i++) {
-            String[] parts = args[i].split(":", 2);
+            String[] parts = splitArgument(args[i]);
             String name = parts[0];
             if(parts.length == 1) {
                 if(this.flags.contains(name)) {
@@ -168,6 +167,14 @@ public abstract class BaseCommand
         return execute(commandSender, flags, parameters, baseParameters);
     }
 
+    public String[] splitArgument(String arg) {
+        String[] parts = arg.split(":", 2);
+        if(parts.length == 1) return parts;
+        if(optional.containsKey(parts[0]) || mandatory.containsKey(parts[0])) return parts;
+        String[] ret = {arg};
+        return ret;
+    }
+    
     public abstract CommandResponse execute(CommandSender commandSender, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException;
 
     public boolean checkMoreThanOne(Boolean... conditions) {

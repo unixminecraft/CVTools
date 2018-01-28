@@ -4,14 +4,22 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Color;
+import org.bukkit.EntityEffect;
+import org.bukkit.FireworkEffect;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import org.cubeville.commons.commands.CommandParser;
 
@@ -43,6 +51,25 @@ public class CVTools extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(command.getName().equals("cvtools")) {
             return commandParser.execute(sender, args);
+        }
+        else if(command.getName().equals("cvtoolstest")) {
+            Player player = (Player) sender;
+            Location loc = player.getLocation();
+            loc.add(20, 0, 0);
+            FireworkEffect effect = FireworkEffect.builder().trail(false).flicker(false).withColor(Color.RED).withFade(Color.BLUE).with(FireworkEffect.Type.BALL).build();
+            final Firework fw = player.getLocation().getWorld().spawn(loc, Firework.class);
+            FireworkMeta meta = fw.getFireworkMeta();
+            meta.addEffect(effect);
+            meta.setPower(0);
+            fw.setFireworkMeta(meta);
+            new BukkitRunnable() {
+                public void run() {
+                    fw.detonate();
+                    //fw.playEffect(EntityEffect.FIREWORK_EXPLODE);
+                    //fw.remove();
+                }
+            }.runTaskLater(this, 1L);
+            
         }
         return false;
     }

@@ -18,7 +18,7 @@ public class Head extends Command {
     public Head() {
         super("head");
         addBaseParameter(new CommandParameterString());
-        addBaseParameter(new CommandParameterString());        
+        addBaseParameter(new CommandParameterString());
         setPermission("cvtools.head");
     }
     

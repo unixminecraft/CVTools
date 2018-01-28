@@ -12,10 +12,10 @@ public class CommandParameterList implements CommandParameterType
     }
 
     public boolean isValid(String value) {
-        String[] parts = value.split(";");
-        if(parts.length != parameters.size()) return false;
-        for(int i = 0; i < parts.length; i++) {
-            if(!parameters.get(i).isValid(parts[i])) return false;
+        List<String> parts = splitParameterList(value);
+        if(parts.size() != parameters.size()) return false;
+        for(int i = 0; i < parts.size(); i++) {
+            if(!parameters.get(i).isValid(parts.get(i))) return false;
         }
         return true;
     }
@@ -26,10 +26,35 @@ public class CommandParameterList implements CommandParameterType
 
     public Object getValue(String value) {
         List<Object> ret = new ArrayList<>();
-        String[] parts = value.split(";");
-        for(int i = 0; i < parts.length; i++) {
-            ret.add(parameters.get(i).getValue(parts[i]));
+        List<String> parts = splitParameterList(value);
+        for(int i = 0; i < parts.size(); i++) {
+            ret.add(parameters.get(i).getValue(parts.get(i)));
         }
+        return ret;
+    }
+
+    private static List<String> splitParameterList(String value) {
+        List<String> ret = new ArrayList<>();
+        String lastpar = "";
+        int inPara = 0;
+        for(int p = 0; p < value.length(); p++) {
+            if(value.charAt(p) == '(') {
+                inPara++;
+                lastpar += "(";
+            }
+            else if(value.charAt(p) == ')') {
+                inPara--;
+                lastpar += ")";
+            }
+            else if(value.charAt(p) == ';' && inPara == 0) {
+                ret.add(lastpar);
+                lastpar = "";
+            }
+            else {
+                lastpar += value.charAt(p);
+            }
+        }
+        ret.add(lastpar);
         return ret;
     }
 }

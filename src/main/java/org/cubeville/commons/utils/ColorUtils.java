@@ -88,7 +88,7 @@ public class ColorUtils {
     	else if (string.equalsIgnoreCase("yellow"))
             return Color.YELLOW;   	
     	else {
-            throw new IllegalArgumentException(string + "is not a valid color!");
+            return null;
     	}
     }
     

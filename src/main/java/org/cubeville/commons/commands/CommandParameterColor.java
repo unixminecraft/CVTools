@@ -13,7 +13,7 @@ public class CommandParameterColor implements CommandParameterType
     }
 
     public String getInvalidMessage(String value) {
-        return value + " is no valid enchantment!";
+        return value + " is no valid color!";
     }
 
     public Object getValue(String value) {

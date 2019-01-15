@@ -19,6 +19,7 @@ public abstract class BaseCommand
     private Map<String, CommandParameterType> mandatory;
     private List<CommandParameterType> base;
     int mandatoryBase;
+    boolean silentConsole;
     
     public BaseCommand(String fullCommand) {
         if(fullCommand.length() == 0) {
@@ -31,6 +32,7 @@ public abstract class BaseCommand
         optional = new HashMap<>();
         mandatory = new HashMap<>();
         base = new ArrayList<>();
+        silentConsole = false;
     }
 
     public String getFullCommand() {
@@ -199,4 +201,6 @@ public abstract class BaseCommand
         return cnt == 1;
     }
 
+    public void setSilentConsole() { silentConsole = true; }
+    public boolean isSilentConsole() { return silentConsole; }
 }

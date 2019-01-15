@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import org.cubeville.commons.utils.ColorUtils;
 
 public class CommandParser
@@ -46,16 +48,18 @@ public class CommandParser
 
             if(cmdMatch >= 0) { 
                 CommandResponse response = cmd.execute(commandSender, args);
-                if(response == null) {
-                    commandSender.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
-                }
-                else {
-                    if(response.getMessages() == null) {
-                        commandSender.sendMessage(ColorUtils.addColor("&cNothing. Nada. Niente."));
+                if(cmd.isSilentConsole() == false || commandSender instanceof Player) {
+                    if(response == null) {
+                        commandSender.sendMessage(ColorUtils.addColor("&aCommand executed successfully."));
                     }
                     else {
-                        for (String message: response.getMessages())
-                            commandSender.sendMessage(ColorUtils.addColor(message));
+                        if(response.getMessages() == null) {
+                            commandSender.sendMessage(ColorUtils.addColor("&cNothing. Nada. Niente."));
+                        }
+                        else {
+                            for (String message: response.getMessages())
+                                commandSender.sendMessage(ColorUtils.addColor(message));
+                        }
                     }
                 }
                 return true;

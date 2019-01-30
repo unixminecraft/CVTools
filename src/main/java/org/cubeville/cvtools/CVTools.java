@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.EntityEffect;
 import org.bukkit.FireworkEffect;
@@ -40,6 +41,8 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new DelayedTask(this));
         commandParser.addCommand(new Head());
         commandParser.addCommand(new Info());
+        commandParser.addCommand(new Itemname());
+        commandParser.addCommand(new KillEntities());
 
         noGrowthWorlds = new HashSet<>();
         noGrowthWorlds.add(UUID.fromString("f2d1566c-af98-4f1c-beb8-793a17deaf37"));
@@ -53,23 +56,24 @@ public class CVTools extends JavaPlugin implements Listener {
             return commandParser.execute(sender, args);
         }
         else if(command.getName().equals("cvtoolstest")) {
-            Player player = (Player) sender;
-            Location loc = player.getLocation();
-            loc.add(20, 0, 0);
-            FireworkEffect effect = FireworkEffect.builder().trail(false).flicker(false).withColor(Color.RED).withFade(Color.BLUE).with(FireworkEffect.Type.BALL).build();
-            final Firework fw = player.getLocation().getWorld().spawn(loc, Firework.class);
-            FireworkMeta meta = fw.getFireworkMeta();
-            meta.addEffect(effect);
-            meta.setPower(0);
-            fw.setFireworkMeta(meta);
-            new BukkitRunnable() {
-                public void run() {
-                    fw.detonate();
-                    //fw.playEffect(EntityEffect.FIREWORK_EXPLODE);
-                    //fw.remove();
-                }
-            }.runTaskLater(this, 1L);
-            
+            // Player player = (Player) sender;
+            // Location loc = player.getLocation();
+            // loc.add(20, 0, 0);
+            // FireworkEffect effect = FireworkEffect.builder().trail(false).flicker(false).withColor(Color.RED).withFade(Color.BLUE).with(FireworkEffect.Type.BALL).build();
+            // final Firework fw = player.getLocation().getWorld().spawn(loc, Firework.class);
+            // FireworkMeta meta = fw.getFireworkMeta();
+            // meta.addEffect(effect);
+            // meta.setPower(0);
+            // fw.setFireworkMeta(meta);
+            // new BukkitRunnable() {
+            //     public void run() {
+            //         fw.detonate();
+            //         //fw.playEffect(EntityEffect.FIREWORK_EXPLODE);
+            //         //fw.remove();
+            //     }
+            // }.runTaskLater(this, 1L);
+            Player player = Bukkit.getServer().getPlayer(args[0]);
+            sender.sendMessage("Player " + player.getName() + " isdead: " + player.isDead());
         }
         return false;
     }

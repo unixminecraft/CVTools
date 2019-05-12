@@ -43,7 +43,8 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new Info());
         commandParser.addCommand(new Itemname());
         commandParser.addCommand(new KillEntities());
-
+        commandParser.addCommand(new FindBlocks());
+        commandParser.addCommand(new Title());
         noGrowthWorlds = new HashSet<>();
         noGrowthWorlds.add(UUID.fromString("f2d1566c-af98-4f1c-beb8-793a17deaf37"));
 

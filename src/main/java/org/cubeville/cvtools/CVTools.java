@@ -30,8 +30,6 @@ public class CVTools extends JavaPlugin implements Listener {
 
     private CommandParser commandParser;
 
-    Set<UUID> noGrowthWorlds;
-
     public void onEnable() {
         commandParser = new CommandParser();
         commandParser.addCommand(new ChatColor());
@@ -39,14 +37,13 @@ public class CVTools extends JavaPlugin implements Listener {
         commandParser.addCommand(new CheckRegionPlayers());
         commandParser.addCommand(new CheckSign());
         commandParser.addCommand(new DelayedTask(this));
+        commandParser.addCommand(new FindBlocks());
         commandParser.addCommand(new Head());
         commandParser.addCommand(new Info());
         commandParser.addCommand(new Itemname());
         commandParser.addCommand(new KillEntities());
-        commandParser.addCommand(new FindBlocks());
+        commandParser.addCommand(new PathBlockUtil());
         commandParser.addCommand(new Title());
-        noGrowthWorlds = new HashSet<>();
-        noGrowthWorlds.add(UUID.fromString("f2d1566c-af98-4f1c-beb8-793a17deaf37"));
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
@@ -77,13 +74,6 @@ public class CVTools extends JavaPlugin implements Listener {
             sender.sendMessage("Player " + player.getName() + " isdead: " + player.isDead());
         }
         return false;
-    }
-
-    @EventHandler
-    public void onBlockGrow(BlockGrowEvent event) {
-        if(noGrowthWorlds.contains(event.getBlock().getLocation().getWorld().getUID())) {
-            event.setCancelled(true);
-        }
     }
 
 }

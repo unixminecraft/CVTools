@@ -50,7 +50,7 @@ public class ColorUtils {
             }
     	}
     	
-    	return Color.fromRGB(i.get(1), i.get(2), i.get(2));
+    	return Color.fromRGB(i.get(0), i.get(1), i.get(2));
     }
     public static Color getColorFromString(String string) {
     	if (string.equalsIgnoreCase("aqua"))

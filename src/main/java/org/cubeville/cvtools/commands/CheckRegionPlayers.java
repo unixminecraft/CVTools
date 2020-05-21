@@ -20,6 +20,8 @@ import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandParameterWorld;
 import org.cubeville.commons.commands.CommandResponse;
 
+import org.cubeville.commons.utils.BlockUtils;
+
 public class CheckRegionPlayers extends BaseCommand {
 
     public CheckRegionPlayers() {
@@ -45,10 +47,8 @@ public class CheckRegionPlayers extends BaseCommand {
             throw new CommandExecutionException("World must be specified if used on console.");
         }
 
-        WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        RegionManager regionManager = worldGuard.getRegionManager(world);
         String name = (String) baseParameters.get(0);
-        ProtectedRegion region = regionManager.getRegion(name);
+        ProtectedRegion region = BlockUtils.getWGRegion(world, name);
         List<Player> players = world.getPlayers();
         String playerList = "";
         int playerCount = 0;

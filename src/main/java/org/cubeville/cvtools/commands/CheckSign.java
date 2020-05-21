@@ -1,5 +1,7 @@
 package org.cubeville.cvtools.commands;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +24,20 @@ import org.cubeville.commons.utils.ColorUtils;
 
 public class CheckSign extends Command {
 
+    private final Set<Material> signMaterials =
+        new HashSet<>(Arrays.asList(Material.ACACIA_WALL_SIGN,
+                                    Material.BIRCH_WALL_SIGN,
+                                    Material.DARK_OAK_WALL_SIGN,
+                                    Material.JUNGLE_WALL_SIGN,
+                                    Material.OAK_WALL_SIGN,
+                                    Material.SPRUCE_WALL_SIGN,
+                                    Material.ACACIA_SIGN,
+                                    Material.BIRCH_SIGN,
+                                    Material.DARK_OAK_SIGN,
+                                    Material.JUNGLE_SIGN,
+                                    Material.OAK_SIGN,
+                                    Material.SPRUCE_SIGN));
+    
     public CheckSign() {
         super("checksign");
         addBaseParameter(new CommandParameterString());
@@ -47,14 +63,14 @@ public class CheckSign extends Command {
         
         List<Block> signs;
         if(flags.contains("we")) {
-            signs = BlockUtils.getBlocksInWESelectionByType(player, limit, Material.SIGN_POST, Material.WALL_SIGN);
+            signs = BlockUtils.getBlocksInWESelectionByType(player, limit, signMaterials);
         }
         else if(parameters.containsKey("wg")) {
-            signs = BlockUtils.getBlocksInWGRegionByType(player, (String) parameters.get("wg"), limit, Material.SIGN_POST, Material.WALL_SIGN);
+            signs = BlockUtils.getBlocksInWGRegionByType(player, (String) parameters.get("wg"), limit, signMaterials);
         }
         else if(baseParameters.size() == 2) {
             if((int) baseParameters.get(1) > 25) throw new CommandExecutionException("Maximum radius is 25.");
-            signs = BlockUtils.getBlocksInRadiusByType(player.getLocation(), (int) baseParameters.get(1), Material.SIGN_POST, Material.WALL_SIGN);
+            signs = BlockUtils.getBlocksInRadiusByType(player.getLocation(), (int) baseParameters.get(1), signMaterials);
         }
         else {
             throw new CommandExecutionException("No radius / we / wg.");

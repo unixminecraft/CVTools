@@ -8,14 +8,16 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 public class PlayerUtils {
 
@@ -51,9 +53,12 @@ public class PlayerUtils {
 	
     public static Set<ProtectedRegion> getRegionsAtPlayerLocation(Player player) {
         Location location = player.getLocation();
-        Vector vLocation = new Vector(location.getX(), location.getY(), location.getZ());
-        WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        RegionManager regionManager = worldGuard.getRegionManager(location.getWorld());
+        BlockVector3 vLocation = BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = container.get(BukkitAdapter.adapt(location.getWorld()));
+
+
         if(regionManager == null) { return null; }
         return regionManager.getApplicableRegions(vLocation).getRegions();
     }

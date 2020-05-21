@@ -1,7 +1,8 @@
 name: CVTools
 main: org.cubeville.cvtools.CVTools
 authors: [KipperOrigin,FrediW]
-version: 0.3
+version: 0.5
+api-version: 1.15
 
 depend: [WorldEdit,WorldGuard]
 

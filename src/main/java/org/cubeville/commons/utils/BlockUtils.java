@@ -2,6 +2,7 @@ package org.cubeville.commons.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,11 +13,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.sk89q.worldedit.bukkit.*;
-import com.sk89q.worldedit.bukkit.selections.*;
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public class BlockUtils {
@@ -52,23 +56,29 @@ public class BlockUtils {
 
     public static List<Block> getBlocksInWESelection(Player player, int limit) {
         WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-        Selection selection = worldEdit.getSelection(player);
+        Region selection;
+        try {
+            selection = worldEdit.getSession(player).getSelection(worldEdit.getSession(player).getSelectionWorld());
+        }
+        catch(IncompleteRegionException e) {
+            throw new IllegalArgumentException("Region selection incomplete.");
+        }
         if(selection == null) throw new IllegalArgumentException("No region selected.");
 
-        World world = selection.getWorld();
-        Location min = selection.getMinimumPoint();
-        Location max = selection.getMaximumPoint();
+        World world = BukkitAdapter.adapt(worldEdit.getSession(player).getSelectionWorld());
+        BlockVector3 min = selection.getMinimumPoint();
+        BlockVector3 max = selection.getMaximumPoint();
         List<Block> blocks = new ArrayList<>();
 
-        int width = max.getBlockX() - min.getBlockX() + 1;
-        int height = max.getBlockY() - min.getBlockY() + 1;
-        int length = max.getBlockZ() - min.getBlockZ() + 1;
+        int width = max.getX() - min.getX() + 1;
+        int height = max.getY() - min.getY() + 1;
+        int length = max.getZ() - min.getZ() + 1;
         if(width * length * height > limit) throw new IllegalArgumentException("Limit of " + limit + " reached!");
 
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++) {
             for(int y = min.getBlockY(); y <= max.getBlockY(); y++) {
                 for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    if(selection.contains(new Location(world, x, y, z))) {
+                    if(selection.contains(BlockVector3.at(x, y, z))) {
                         blocks.add(world.getBlockAt(x, y, z));
                     }
                 }
@@ -80,8 +90,8 @@ public class BlockUtils {
     public static List<Block> getBlocksInWGRegion(World world, String name, int limit) {
         ProtectedRegion region = getWGRegion(world, name);
 
-        BlockVector min = region.getMinimumPoint();
-        BlockVector max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
         List<Block> blocks = new ArrayList<>();
 
         int width = max.getBlockX() - min.getBlockX() + 1;
@@ -92,7 +102,7 @@ public class BlockUtils {
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++) {
             for(int y = min.getBlockY(); y <= max.getBlockY(); y++) {
                 for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    if(region.contains(new BlockVector(x, y, z))) {
+                    if(region.contains(BlockVector3.at(x, y, z))) {
                         blocks.add(world.getBlockAt(x, y, z));
                     }
                 }
@@ -102,9 +112,9 @@ public class BlockUtils {
     }
 
     public static int getWESelectionArea(Player player) {
-        Selection sel = getWESelection(player);
-        Location min = sel.getMinimumPoint();
-        Location max = sel.getMaximumPoint();
+        Region sel = getWESelection(player);
+        BlockVector3 min = sel.getMinimumPoint();
+        BlockVector3 max = sel.getMaximumPoint();
         int y = min.getBlockY();
         int xmin = min.getBlockX();
         int xmax = max.getBlockX();
@@ -113,7 +123,7 @@ public class BlockUtils {
         int cnt = 0;
         for(int x = xmin; x <= xmax; x++) {
             for(int z = zmin; z <= zmax; z++) {
-                if(sel.contains(new Vector(x, y, z).toLocation(player.getLocation().getWorld()))) cnt++;
+                if(sel.contains(BlockVector3.at(x, y, z))) cnt++;
             }
         }
         return cnt;
@@ -121,42 +131,52 @@ public class BlockUtils {
     
     public static void setWESelection(Player player, World world, Vector pos1, Vector pos2) {
         WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-        com.sk89q.worldedit.Vector wep1 = new com.sk89q.worldedit.Vector(pos1.getX(), pos1.getY(), pos1.getZ());
-        com.sk89q.worldedit.Vector wep2 = new com.sk89q.worldedit.Vector(pos2.getX(), pos2.getY(), pos2.getZ());
-        Selection selection = new CuboidSelection(world, wep1, wep2);
-        worldEdit.setSelection(player, selection);
+        BlockVector3 wep1 = BlockVector3.at(pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ());
+        BlockVector3 wep2 = BlockVector3.at(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ());
+        CuboidRegionSelector selector = new CuboidRegionSelector(BukkitAdapter.adapt(world), wep1, wep2);
+        worldEdit.getSession(player).setRegionSelector(BukkitAdapter.adapt(world), selector);
+        //Selection selection = new CuboidSelection(world, wep1, wep2);
+        //worldEdit.setSelection(player, selection);
     }
 
-    public static Selection getWESelection(Player player) {
+    public static Region getWESelection(Player player) {
         WorldEditPlugin worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-        Selection selection = worldEdit.getSelection(player);
+        Region selection;
+        try {
+            selection = worldEdit.getSession(player).getSelection(worldEdit.getSession(player).getSelectionWorld());
+        }
+        catch(IncompleteRegionException e) {
+            throw new IllegalArgumentException("Incomplete region selection.");
+        }
         if(selection == null) throw new IllegalArgumentException("No region selected.");
         return selection;
     }
     
     public static Location getWESelectionMin(Player player) {
-        return getWESelection(player).getMinimumPoint();
+        BlockVector3 min = getWESelection(player).getMinimumPoint();
+        return new Location(BukkitAdapter.adapt(getWESelection(player).getWorld()), min.getX(), min.getY(), min.getZ());
     }
 
     public static Location getWESelectionMax(Player player) {
-        return getWESelection(player).getMaximumPoint();
+        BlockVector3 min = getWESelection(player).getMaximumPoint();
+        return new Location(BukkitAdapter.adapt(getWESelection(player).getWorld()), min.getX(), min.getY(), min.getZ());
     }
 
     public static ProtectedRegion getWGRegion(World world, String name) {
-        WorldGuardPlugin worldGuard = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        RegionManager regionManager = worldGuard.getRegionManager(world);
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
         ProtectedRegion region = regionManager.getRegion(name);
         if(region == null) throw new IllegalArgumentException("No region found by that name!");
         return region;
     }
 
     public static Vector getWGRegionMin(World world, String name) {
-        BlockVector min = getWGRegion(world, name).getMinimumPoint();
+        BlockVector3 min = getWGRegion(world, name).getMinimumPoint();
         return new Vector(min.getX(), min.getY(), min.getZ());
     }
 
     public static Vector getWGRegionMax(World world, String name) {
-        BlockVector max = getWGRegion(world, name).getMaximumPoint();
+        BlockVector3 max = getWGRegion(world, name).getMaximumPoint();
         return new Vector(max.getX(), max.getY(), max.getZ());
     }
 
@@ -164,7 +184,12 @@ public class BlockUtils {
         List<Block> blocks = getBlocksInRadius(loc, radius);
         return getBlocksByType(blocks, mats);
     }
-	
+
+    public static List<Block> getBlocksInRadiusByType(Location loc, int radius, Set<Material> materials) {
+        List<Block> blocks = getBlocksInRadius(loc, radius);
+        return getBlocksByType(blocks, materials);
+    }
+    
     public static List<Block> getBlocksInCubeByType(Location loc1, Location loc2, Material... mats) {
         List<Block> blocks = getBlocksInCube(loc1, loc2);
         return getBlocksByType(blocks, mats);
@@ -175,6 +200,11 @@ public class BlockUtils {
         return getBlocksByType(blocks, mats);
     }
 
+    public static List<Block> getBlocksInWESelectionByType(Player player, int limit, Set<Material> materials) {
+        List<Block> blocks = getBlocksInWESelection(player, limit);
+        return getBlocksByType(blocks, materials);
+    }
+    
     public static List<Block> getBlocksInWGRegionByType(Player player, String name, int limit, Material... mats) {
         return getBlocksInWGRegionByType(player.getWorld(), name, limit, mats);
     }
@@ -184,6 +214,15 @@ public class BlockUtils {
         return getBlocksByType(blocks, mats);
     }
 
+    public static List<Block> getBlocksInWGRegionByType(World world, String name, int limit, Set<Material> materials) {
+        List<Block> blocks = getBlocksInWGRegion(world, name, limit);
+        return getBlocksByType(blocks, materials);
+    }
+
+    public static List<Block> getBlocksInWGRegionByType(Player player, String name, int limit, Set<Material> materials) {
+        return getBlocksInWGRegionByType(player.getWorld(), name, limit, materials);
+    }
+    
     public static List<Block> getBlocksByType(List<Block> blocks, Material... mats) {
         if(blocks == null) return null;
 
@@ -196,6 +235,18 @@ public class BlockUtils {
         }
 
         return newBlocks;
+    }
+
+    public static List<Block> getBlocksByType(List<Block> blocks, Set<Material> materials) {
+        if(blocks == null) return null;
+
+        List<Block> ret = new ArrayList<>();
+
+        for(Block block: blocks) {
+            if(materials.contains(block.getType())) ret.add(block);
+        }
+
+        return ret;
     }
     
     public static Block getNearestBlock(List<Block> blocks, Location loc) {

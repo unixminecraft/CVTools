@@ -1,5 +1,7 @@
 package org.cubeville.cvtools.commands;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +22,20 @@ import org.cubeville.commons.utils.ColorUtils;
 
 public class FindBlocks extends Command {
 
+    private final Set<Material> signMaterials =
+        new HashSet<>(Arrays.asList(Material.ACACIA_WALL_SIGN,
+                                    Material.BIRCH_WALL_SIGN,
+                                    Material.DARK_OAK_WALL_SIGN,
+                                    Material.JUNGLE_WALL_SIGN,
+                                    Material.OAK_WALL_SIGN,
+                                    Material.SPRUCE_WALL_SIGN,
+                                    Material.ACACIA_SIGN,
+                                    Material.BIRCH_SIGN,
+                                    Material.DARK_OAK_SIGN,
+                                    Material.JUNGLE_SIGN,
+                                    Material.OAK_SIGN,
+                                    Material.SPRUCE_SIGN));
+    
     public FindBlocks() {
         super("findblocks");
         addBaseParameter(new CommandParameterString());
@@ -39,7 +55,7 @@ public class FindBlocks extends Command {
             int y = block.getLocation().getBlockY();
             int z = block.getLocation().getBlockZ();
             String desc = block.getWorld().getName() + ";" + x + "/" + y + "/" + z;
-            if(material == Material.WALL_SIGN || material == Material.SIGN_POST) {
+            if(signMaterials.contains(material)) {
                 Sign sign = (Sign)block.getState();
                 String[] lines = sign.getLines();
                 String lineCon = "";

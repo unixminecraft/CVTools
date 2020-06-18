@@ -14,27 +14,42 @@ commands:
     description: CVTools Test Command
     permission: cvtools.testcommand
   ping:
-    description: Command of utmost importance.
+    description: Command of utmost importance
     permission: cvtools.ping
   clear:
-    description: Clears one's inventory.
+    description: Clears one's inventory
     permission: cvtools.clear.use
   more:
-    description: Increases the number of items in the player's main hand to its maximum stack size.
+    description: Increases the number of items in the player's main hand to its maximum stack size
     permission: cvtools.more
   item:
-    description: Alias of the default Minecraft /give command.
+    description: Alias of the default Minecraft /give command
     permission: cvtools.item
     aliases: i
   time:
-    description: Check the time.
+    description: Check the time
     permission: cvtools.time
   weather:
-    description: Change the weather.
+    description: Change the weather
     permission: cvtools.weather
   shock:
-    description: Shock a player.
+    description: Shock a player
     permission: cvtools.shock
+  thor:
+    description: Turn on Thor's Hammer/Axe
+    permission: cvtools.thor
+  unthor:
+    description: Turn off Thor's Hammer/Axe
+    permission: cvtools.thor
+  slap:
+    description: Slap a player
+    permission: cvtools.slap
+  rocket:
+    description: Rocket a player
+    permission: cvtools.rocket
+  barrage:
+    description: Barrage a player
+    permission: cvtools.barrage
 
 permissions:
   
@@ -116,6 +131,9 @@ permissions:
   cvtools.time:
     description: Permission to use the /time command
     default: true
+  cvtools.time.set:
+    description: Permission to set the time with the /time command
+    default: op
   cvtools.weather:
     description: Permission to use the /weather command
     default: op
@@ -130,4 +148,19 @@ permissions:
     default: op
   cvtools.shock:
     description: Permission to use the /shock command
+    default: op
+  cvtools.thor:
+    description: Permission to use the /thor and /unthor commands
+    default: op
+  cvtools.thor.other:
+    description: Permission to /thor or /unthor another player
+    default: op
+  cvtools.slap:
+    description: Permission to use the /slap command
+    default: op
+  cvtools.rocket:
+    description: Permission to use the /rocket command
+    default: op
+  cvtools.barrage:
+    description: Permission to use the /barrage command
     default: op

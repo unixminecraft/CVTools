@@ -1,6 +1,7 @@
 package org.cubeville.cvtools.commands;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class Item extends BaseCommand {
 		
 		Player player;
 		boolean samePlayer;
-		if(playerName.equalsIgnoreCase(playerName)) {
+		if(playerName.equalsIgnoreCase(sender.getName())) {
 			player = (Player) sender;
 			samePlayer = true;
 		}
@@ -72,7 +73,13 @@ public class Item extends BaseCommand {
 		playerName = player.getName();
 		if(!player.isOnline()) { throw new CommandExecutionException("&cPlayer &6" + playerName + " &cis not online."); }
 		
-		int leftover = player.getInventory().addItem((ItemStack[]) itemStacks.toArray()).keySet().iterator().next();
+		Iterator<ItemStack> iter = player.getInventory().addItem(itemStacks.toArray(new ItemStack[itemStacks.size()])).values().iterator();
+		int leftover = 0;
+		while(iter.hasNext()) {
+			leftover += iter.next().getAmount();
+		}
+		
+		if(!samePlayer) { player.sendMessage("§aYou have been given " + (totalItems - leftover) + " of " + material.getKey().getKey() + "."); }
 		
 		CommandResponse response = new CommandResponse();
 		response.addMessage("&aGiven " + (totalItems - leftover) + " of " + material.getKey().getKey() + (samePlayer ? "" : " to " + playerName));

@@ -55,7 +55,7 @@ public class Weather extends BaseCommand {
 		}
 		else if(storm.contains(weather)) {
 			raining = true;
-			thundering = false;
+			thundering = true;
 		}
 		else {
 			throw new CommandExecutionException("&cUnknown weather type &6" + weather);
@@ -97,10 +97,10 @@ public class Weather extends BaseCommand {
 		
 		if(!silent) {
 			String message = "§e" + (isPlayer ? sender.getName() : "The Server") + " has ";
-			if(thundering) { message += "started a thunderstorm on"; }
-			else if(raining) { message += "brought rain to"; }
-			else { message += "cleared the skys on"; }
-			message += world.getName() + ".";
+			if(thundering) { message += "started a thunderstorm on "; }
+			else if(raining) { message += "brought rain to "; }
+			else { message += "cleared the sky on "; }
+			message += "'" + world.getName() + "'.";
 			for(Player player : Bukkit.getOnlinePlayers()) { player.sendMessage(message); }
 		}
 		if(thundering) { return new CommandResponse("&eWOO LIGHTNING! TIME TO ZAP SOMEONE!"); }

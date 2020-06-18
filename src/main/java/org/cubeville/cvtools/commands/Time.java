@@ -25,6 +25,6 @@ public class Time extends Command {
 		else if(hour < 12) { friendlyHour = (int) hour; }
 		else if(hour == 12) { friendlyHour = 12; }
 		else { friendlyHour = (int) hour - 12; }
-		return new CommandResponse("&bCurrent Time: " + friendlyHour + ":" + minute + (isMorning ? "AM" : "PM") + " (" + hour + ":" + minute + ")");
+		return new CommandResponse("&bCurrent Time: " + friendlyHour + ":" + String.format("%02d", minute) + (isMorning ? "AM" : "PM") + " (" + String.format("%02d", hour) + ":" + String.format("%02d", minute) + ")");
 	}
 }
